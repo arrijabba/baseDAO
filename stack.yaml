@@ -8,4 +8,10 @@ packages:
   - template
   - ligo/haskell
 
+extra-deps:
+  - git: https://gitlab.com/morley-framework/morley-ledgers.git
+    commit: 2afb1137119562e3afa052cdc08c4af8e0325af0
+    # nix-sha256: 0b95l5m22bfsd0bw8c0hgd10gm36y30f9bbginbb7js0fqf4166y
+    subdirs:
+      - code/morley-ledgers-test
 # See extra-deps in template/snapshot.yaml
