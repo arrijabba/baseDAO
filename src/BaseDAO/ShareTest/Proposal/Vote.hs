@@ -38,7 +38,7 @@ voteNonExistingProposal _ originateFn = do
         }
 
   withSender (AddressResolved owner2) $ call dao (Call @"Vote") [params]
-    & expectCustomError_ #pROPOSAL_NOT_EXIST
+    & expectCustomErrorNoArg #pROPOSAL_NOT_EXIST
 
 voteMultiProposals
   :: forall pm param config caps base m.
@@ -98,7 +98,7 @@ insufficientTokenVote _ originateFn = do
         ]
 
   withSender (AddressResolved owner2) $ call dao (Call @"Vote") params
-    & expectCustomError_ #vOTING_INSUFFICIENT_BALANCE
+    & expectCustomErrorNoArg #vOTING_INSUFFICIENT_BALANCE
 
 voteOutdatedProposal
   :: forall pm param config caps base m.

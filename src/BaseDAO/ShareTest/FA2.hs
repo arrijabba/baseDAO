@@ -286,7 +286,7 @@ validateTokenScenario originateFn = do
   callWith (params unfrozenTokenId)
 
   callWith (params frozenTokenId)
-    & expectCustomError_ #fROZEN_TOKEN_NOT_TRANSFERABLE
+    & expectCustomErrorNoArg #fROZEN_TOKEN_NOT_TRANSFERABLE
   callWith (params unknownTokenId)
     & expectCustomError_ #fA2_TOKEN_UNDEFINED
 
@@ -311,7 +311,7 @@ validateTokenOwnerScenario originateFn = do
   callWith (params unfrozenTokenId)
 
   callWith (params frozenTokenId)
-    & expectCustomError_ #fROZEN_TOKEN_NOT_TRANSFERABLE
+    & expectCustomErrorNoArg #fROZEN_TOKEN_NOT_TRANSFERABLE
   callWith (params unknownTokenId)
     & expectCustomError_ #fA2_TOKEN_UNDEFINED
 

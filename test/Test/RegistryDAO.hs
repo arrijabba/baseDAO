@@ -99,7 +99,7 @@ validConfigProposal = uncapsNettest $ do
 
   -- Fail due too big proposal size
   _ <- createSampleProposal ((getTokensAmount longNormalProposalMetadata) + 5) longNormalProposalMetadata owner1 dao
-    & expectCustomError_ #fAIL_PROPOSAL_CHECK
+    & expectCustomErrorNoArg #fAIL_PROPOSAL_CHECK
 
   -- Expected token is 58 + 5 in this case
   _ <- createSampleProposal ((getTokensAmount normalProposalMetadata) + 5) normalProposalMetadata owner1 dao

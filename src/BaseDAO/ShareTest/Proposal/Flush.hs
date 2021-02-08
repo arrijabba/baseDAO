@@ -94,7 +94,7 @@ flushAcceptedProposals _ originateFn = do
 
   -- TODO: [#31]
   -- checkIfAProposalExist (key1 :: ByteString) dao
-  --   & expectCustomError_ #pROPOSAL_NOT_EXIST
+  --   & expectCustomErrorNoArg #pROPOSAL_NOT_EXIST
 
   checkTokenBalance (frozenTokenId) dao owner1 0
   checkTokenBalance (unfrozenTokenId) dao owner1 100 -- proposer
@@ -205,7 +205,7 @@ flushRejectProposalQuorum _ originateFn = do
 
   -- TODO: [#31]
   -- checkIfAProposalExist (key1 :: ByteString) dao
-  --   & expectCustomError_ #pROPOSAL_NOT_EXIST
+  --   & expectCustomErrorNoArg #pROPOSAL_NOT_EXIST
 
   checkTokenBalance (frozenTokenId) dao owner1 0
   checkTokenBalance (unfrozenTokenId) dao owner1 95 -- proposer: cRejectedValue reduce frozen token by half
@@ -257,7 +257,7 @@ flushRejectProposalNegativeVotes _ originateFn = do
 
   -- TODO: [#31]
   -- checkIfAProposalExist (key1 :: ByteString) dao
-  --   & expectCustomError_ #pROPOSAL_NOT_EXIST
+  --   & expectCustomErrorNoArg #pROPOSAL_NOT_EXIST
 
   checkTokenBalance (frozenTokenId) dao owner1 0
   checkTokenBalance (unfrozenTokenId) dao owner1 95 -- proposer: cRejectedValue reduce frozen token by half
@@ -293,7 +293,7 @@ flushWithBadConfig _ originateFn = do
 
   -- TODO: [#31]
   -- checkIfAProposalExist (key1 :: ByteString) dao
-  --   & expectCustomError_ #pROPOSAL_NOT_EXIST
+  --   & expectCustomErrorNoArg #pROPOSAL_NOT_EXIST
 
   checkTokenBalance (frozenTokenId) dao owner1 0
   checkTokenBalance (unfrozenTokenId) dao owner1 90 -- slash all frozen values
