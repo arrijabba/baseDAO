@@ -125,7 +125,7 @@ voteOutdatedProposal _ originateFn = do
     call dao (Call @"Vote") [params]
     advanceTime (sec 25)
     call dao (Call @"Vote") [params]
-      & expectCustomError_ #vOTING_PERIOD_OVER
+      & expectCustomErrorNoArg #vOTING_PERIOD_OVER
 
 voteWithPermit
   :: forall pm param config caps base m.

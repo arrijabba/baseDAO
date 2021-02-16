@@ -173,9 +173,9 @@ updatingOperatorScenario originateFn = do
     & expectCustomError_ #fA2_NOT_OPERATOR
   withSender (AddressResolved owner1) $ do
     call dao (Call @"Update_operators") ([FA2.AddOperator notOwnerParams])
-      & expectCustomError_ #nOT_OWNER
+      & expectCustomErrorNoArg #nOT_OWNER
     call dao (Call @"Update_operators") [FA2.RemoveOperator notOwnerParams]
-      & expectCustomError_ #nOT_OWNER
+      & expectCustomErrorNoArg #nOT_OWNER
 
 lowBalanceScenario
   :: forall caps base m param

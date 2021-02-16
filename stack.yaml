@@ -7,5 +7,11 @@ packages:
   - .
   - template
   - ligo/haskell
+  - ../morley/code/morley
+  - ../morley/code/lorentz
+  - ../morley/code/cleveland
+  - ../morley/code/morley-client
+  - ../indigo
+  - ../morley-ledgers/code/morley-ledgers
 
 # See extra-deps in template/snapshot.yaml

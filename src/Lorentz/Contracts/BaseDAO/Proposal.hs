@@ -92,7 +92,7 @@ checkProposerUnfrozenToken = do
   pair
 
   stGet #sLedger; ifSome nop $ do
-    constructT
+    constructT @("required" :! Natural, "present" :! Natural)
       ( fieldCtor $ getField #ppFrozenToken >> toNamed #required
       , fieldCtor $ push (0 :: Natural) >> toNamed #present
       )
@@ -235,7 +235,7 @@ checkVoterUnfrozenToken = do
 
   stGet #sLedger; ifSome nop
     ( do
-        constructT
+        constructT @("required" :! Natural, "present" :! Natural)
           ( fieldCtor $ getField #vVoteAmount >> toNamed #required
           , fieldCtor $ push (0 :: Natural) >> toNamed #present
           )

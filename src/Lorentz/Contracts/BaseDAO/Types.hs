@@ -30,6 +30,7 @@ module Lorentz.Contracts.BaseDAO.Types
   , MintParam (..)
   , TransferContractTokensParam (..)
   , TokenAddressParam
+  , SomeType
 
   , Storage (..)
   , StorageC
