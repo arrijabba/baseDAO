@@ -61,10 +61,7 @@ checkedPermitSender = do
   checkSignature
   if Holds
   then do dip (drop @(Packed $ DataToSign _)); permitSender
-  else do
-    drop @(Permit _);
-    checkedCoerce_ @(Packed $ DataToSign a);
-    failCustom #mISSIGNED
+  else do drop @(Permit _); checkedCoerce_; failCustom #mISSIGNED
 
 -- | Check that permit is signed by its author, and return the author
 -- and the parameter to work with.

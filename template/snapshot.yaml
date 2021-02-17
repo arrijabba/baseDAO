@@ -6,9 +6,6 @@ name: dao-snapshot
 resolver: lts-16.5
 
 packages:
-  # - morley-1.12.0
-  # - lorentz-0.9.1
-  # - indigo-0.5.0
   - base58-bytestring-0.1.0
   - hex-text-0.1.0.0
   - show-type-0.1.1
@@ -18,19 +15,26 @@ packages:
   - morley-prelude-0.3.0@sha256:9e9473ac14cfa206adf0a3700764c0251de05042f1fe45daf9cb8556079ae663,2085
   - tasty-hunit-compat-0.2@sha256:71e077ae5c514fadd4586efc19315f10fa5f3c94770820f68f63768441d665f7,1199
   - uncaught-exception-0.1.0
-  # - git:
-  #     https://gitlab.com/morley-framework/morley.git # CI can't use SSH
-  #   commit:
-  #     56d74ababeda9aba8e194783fc5e395fa7a6b69a # morley-1.12.0
-  #   subdirs:
-  #     - code/cleveland
-  #     - code/morley-client
+  - git:
+      https://gitlab.com/morley-framework/morley.git # CI can't use SSH
+    commit:
+      4e36df62eef5bae5dd34fafe9bc353e7b34c2308 # rinn7e/#383-error-lorentz-2
+    subdirs:
+      - code/morley
+      - code/lorentz
+      - code/cleveland
+      - code/morley-client
   - git: https://github.com/int-index/caps.git
     commit: c5d61837eb358989b581ed82b1e79158c4823b1b
-  # - git: https://gitlab.com/morley-framework/morley-ledgers.git
-  #   commit: f4e3fffca1d877e404b38c54d8e1b411641c3548 # master
-  #   subdirs:
-  #     - code/morley-ledgers
+
+  - git: https://gitlab.com/morley-framework/indigo.git
+    commit: 6a081851fca09ca487bef840c6e4afd9d53c6765 # rinn7e/morley-#383-update-constraints
+
+
+  - git: https://gitlab.com/morley-framework/morley-ledgers.git
+    commit: bfeb6acb172b0f40612493f74597a91eb75371a7 # rinn7e/morley-#383-update-version-morley-ledger
+    subdirs:
+      - code/morley-ledgers
   - git: https://gitlab.com/morley-framework/morley-metadata.git
     commit: 34342cf86e51190b541a68f795899a4328a3db01 # master
     subdirs:

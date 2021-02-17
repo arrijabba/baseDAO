@@ -68,6 +68,58 @@ packages:
   original:
     hackage: uncaught-exception-0.1.0
 - completed:
+    subdir: code/morley
+    name: morley
+    version: 1.12.0
+    git: https://gitlab.com/morley-framework/morley.git
+    pantry-tree:
+      size: 9440
+      sha256: 0208b9695ec4fea98517e71c7c5d0c6f76852360c8957b5fe359be6ec543e90c
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+  original:
+    subdir: code/morley
+    git: https://gitlab.com/morley-framework/morley.git
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+- completed:
+    subdir: code/lorentz
+    name: lorentz
+    version: 0.9.1
+    git: https://gitlab.com/morley-framework/morley.git
+    pantry-tree:
+      size: 3741
+      sha256: 993ecc7f36dc8348d8c51a096351318d47d1c300e148214d8f222e8d4984b133
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+  original:
+    subdir: code/lorentz
+    git: https://gitlab.com/morley-framework/morley.git
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+- completed:
+    subdir: code/cleveland
+    name: cleveland
+    version: 0.1.0
+    git: https://gitlab.com/morley-framework/morley.git
+    pantry-tree:
+      size: 12033
+      sha256: a207b5182a00d6a5d2e1c864f5e52faeea48f1441be2023cb88d42083b690ee2
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+  original:
+    subdir: code/cleveland
+    git: https://gitlab.com/morley-framework/morley.git
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+- completed:
+    subdir: code/morley-client
+    name: morley-client
+    version: 0.1.0
+    git: https://gitlab.com/morley-framework/morley.git
+    pantry-tree:
+      size: 3088
+      sha256: 7f6d6e90a630df3b62b959e176ccdd3ffa3ebdfd7abaf5d766d68c59af2afa39
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+  original:
+    subdir: code/morley-client
+    git: https://gitlab.com/morley-framework/morley.git
+    commit: 4e36df62eef5bae5dd34fafe9bc353e7b34c2308
+- completed:
     name: caps
     version: '0'
     git: https://github.com/int-index/caps.git
@@ -78,6 +130,30 @@ packages:
   original:
     git: https://github.com/int-index/caps.git
     commit: c5d61837eb358989b581ed82b1e79158c4823b1b
+- completed:
+    name: indigo
+    version: 0.5.0
+    git: https://gitlab.com/morley-framework/indigo.git
+    pantry-tree:
+      size: 14291
+      sha256: 69795c196c486bf44a6032e473fb62ab1c6f281ea790788ba8e5408639cdaccf
+    commit: 6a081851fca09ca487bef840c6e4afd9d53c6765
+  original:
+    git: https://gitlab.com/morley-framework/indigo.git
+    commit: 6a081851fca09ca487bef840c6e4afd9d53c6765
+- completed:
+    subdir: code/morley-ledgers
+    name: morley-ledgers
+    version: 0.2.0.1
+    git: https://gitlab.com/morley-framework/morley-ledgers.git
+    pantry-tree:
+      size: 1524
+      sha256: be4cb21ae9ad9ab284966b5e52e7d9d339a80df9bf7b2ef4986cae0bc13095cc
+    commit: bfeb6acb172b0f40612493f74597a91eb75371a7
+  original:
+    subdir: code/morley-ledgers
+    git: https://gitlab.com/morley-framework/morley-ledgers.git
+    commit: bfeb6acb172b0f40612493f74597a91eb75371a7
 - completed:
     subdir: code/morley-metadata
     name: morley-metadata
