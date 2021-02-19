@@ -1,0 +1,17 @@
+// SPDX-FileCopyrightText: 2020 TQ Tezos
+// SPDX-License-Identifier: LicenseRef-MIT-TQ
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2015",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist/",
+    "composite": true,
+    "rootDir" : "src"
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
