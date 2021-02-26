@@ -93,6 +93,7 @@ library:
     - containers
     - directory
     - filepath
+    - text
     - fmt
     - lens
     - lorentz
