@@ -579,7 +579,7 @@ instance HasAnnotation a => HasAnnotation (PermitProtected a) where
   getAnnotation _ =
     NTPair
       (ann @TypeTag "permit_protected")
-      (noAnn @FieldTag)
+      (ann  @FieldTag "argument")
       (ann @FieldTag "permit")
       (getAnnotation @a NotFollowEntrypoint)
       (getAnnotation @(Maybe (Permit a)) NotFollowEntrypoint)
