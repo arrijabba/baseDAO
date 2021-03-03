@@ -20,19 +20,22 @@ module Ligo.BaseDAO.Types
   , DynamicRec (..)
   , dynRecUnsafe
   , mkStorageL
+  , mkStorageL'
   , mkConfigL
   , mkStartupStorage
   , defaultConfigL
   , mkFullStorageL
+  , mkFullStorageL'
 
   , sOperatorsLens
   ) where
 
 import Lorentz
-import Universum (One(..), fromIntegral, (*))
+import Universum (One(..), fromIntegral, maybe, (*))
 
 import Control.Lens (makeLensesFor)
 import qualified Data.Map as M
+import Named ((!))
 
 import qualified Lorentz.Contracts.Spec.FA2Interface as FA2
 import qualified Lorentz.Contracts.Spec.TZIP16Interface as TZIP16
@@ -177,6 +180,21 @@ mkStorageL admin votingPeriod quorumThreshold extra metadata =
     votingPeriodDef = 60 * 60 * 24 * 7  -- 7 days
     quorumThresholdDef = 4
 
+mkStorageL'
+  :: "admin" :! Address
+  -> "votingPeriod" :? Natural
+  -> "quorumThreshold" :? Natural
+  -> "extra" :! ContractExtraL
+  -> "metadataHostAddress" :! Address
+  -> "metadataHostChain" :? TZIP16.ExtChainId
+  -> "metadataKey" :! MText
+  -> StorageL
+mkStorageL' admin votingPeriod quorumThreshold extra hostAddress hostChain key =
+  mkStorageL admin votingPeriod quorumThreshold extra ! #metadata metadata
+  where
+    host = maybe TZIP16.contractHost TZIP16.foreignContractHost (argF #metadataHostChain hostChain) (arg #metadataHostAddress hostAddress)
+    metadata = TZIP16.metadataURI (TZIP16.tezosStorageUri host (arg #metadataKey key))
+
 data ConfigL = ConfigL
   { cProposalCheck :: '[ProposeParamsL, ContractExtraL] :-> '[Bool]
   , cRejectedProposalReturnValue :: '[ProposalL, ContractExtraL] :-> '["slash_amount" :! Natural]
@@ -254,6 +272,24 @@ mkFullStorageL admin vp qt extra md cEps = FullStorage
   { fsStartup = mkStartupStorage (argDef #customEps [] cEps)
   , fsConfigured = ConfiguredStorage
     { csStorage = mkStorageL admin vp qt extra md
+    , csConfig = mkConfigL
+    }
+  }
+
+mkFullStorageL'
+  :: "admin" :! Address
+  -> "votingPeriod" :? Natural
+  -> "quorumThreshold" :? Natural
+  -> "extra" :! ContractExtraL
+  -> "metadataHostAddress" :! Address
+  -> "metadataHostChain" :? TZIP16.ExtChainId
+  -> "metadataKey" :! MText
+  -> "customEps" :? [(MText, StorableEntrypoint)]
+  -> FullStorage
+mkFullStorageL' admin vp qt extra mdAddress mdChain mdKey cEps = FullStorage
+  { fsStartup = mkStartupStorage (argDef #customEps [] cEps)
+  , fsConfigured = ConfiguredStorage
+    { csStorage = mkStorageL' admin vp qt extra mdAddress mdChain mdKey
     , csConfig = mkConfigL
     }
   }

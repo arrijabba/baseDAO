@@ -215,8 +215,9 @@ let registry_DAO_decision_lambda (proposal, extras : proposal * contract_extra)
         | None -> new_ce
       in (([] : operation list), new_ce)
 
-let default_registry_DAO_full_storage (admin, token_address, a, b, s_max, c, d
-    : (address * address * nat * nat * nat * nat * nat)) : full_storage =
+let default_registry_DAO_full_storage (
+    admin, token_address, a, b, s_max, c, d, metadata
+    : (address * address * nat * nat * nat * nat * nat * (string, bytes) big_map)) : full_storage =
   let (startup, (store, config)) = default_full_storage (admin, token_address) in
   let new_storage = { store with
     extra = Map.literal [
@@ -229,6 +230,7 @@ let default_registry_DAO_full_storage (admin, token_address, a, b, s_max, c, d
           ("c" , Bytes.pack c); // slashvalue
           ("d" , Bytes.pack d); // slash_division_value
           ];
+    metadata = metadata
   } in
   let new_config = { config with
     proposal_check = registry_DAO_proposal_check;
@@ -236,7 +238,6 @@ let default_registry_DAO_full_storage (admin, token_address, a, b, s_max, c, d
     decision_lambda = registry_DAO_decision_lambda;
     } in
   (startup, (new_storage, new_config))
-
 
 // We are not using this right now, but just leaving here in case we might want it
 // soon.

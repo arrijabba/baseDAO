@@ -86,6 +86,11 @@ $(OUT)/trivialDAO_storage.tz: src/**
 	# See "$(OUT)/trivialDAO_storage.tz" for compilation result  #
 	#
 
+# Are we empty? If so produce an empty big_map, otherwise make the TZIP-16 metadata big_map.
+define make-metadata
+$(if $(filter "$(1)$(2)$(3)",""),(Big_map.empty : (string, bytes) big_map),Big_map.literal [("" , Bytes.pack "tezos-storage://$(1)$(if $(filter "$(2)",""),,.$(2))/$(3)")])
+endef
+
 $(OUT)/registryDAO_storage.tz : admin_address = tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af
 $(OUT)/registryDAO_storage.tz : token_address = tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af
 $(OUT)/registryDAO_storage.tz : a = 1n
@@ -93,10 +98,13 @@ $(OUT)/registryDAO_storage.tz : b = 0n
 $(OUT)/registryDAO_storage.tz : s_max = 100n
 $(OUT)/registryDAO_storage.tz : c = 1n
 $(OUT)/registryDAO_storage.tz : d = 0n
+$(OUT)/registryDAO_storage.tz : metadata_host_address =
+$(OUT)/registryDAO_storage.tz : metadata_host_chain =
+$(OUT)/registryDAO_storage.tz : metadata_key =
 $(OUT)/registryDAO_storage.tz: src/**
 	# ============== Compiling RegistryDAO storage ============== #
 	mkdir -p $(OUT)
-	$(BUILD_STORAGE) --output-file $(OUT)/registryDAO_storage.tz src/registryDAO.mligo base_DAO_contract 'default_registry_DAO_full_storage(("$(admin_address)": address), ("$(token_address)": address), ${a}, $(b), $(s_max), $(c), $(d))'
+	$(BUILD_STORAGE) --output-file $(OUT)/registryDAO_storage.tz src/registryDAO.mligo base_DAO_contract 'default_registry_DAO_full_storage(("$(admin_address)": address), ("$(token_address)": address), ${a}, $(b), $(s_max), $(c), $(d), $(call make-metadata,$(metadata_host_address),$(metadata_host_chain),$(metadata_key)))'
 	# ================= Compilation successful ================= #
 	# See "$(OUT)/registryDAO_storage.tz" for compilation result #
 	#
@@ -110,10 +118,13 @@ $(OUT)/treasuryDAO_storage.tz : c = 0n
 $(OUT)/treasuryDAO_storage.tz : d = 0n
 $(OUT)/treasuryDAO_storage.tz : y = 0mutez
 $(OUT)/treasuryDAO_storage.tz : z = 100mutez
+$(OUT)/treasuryDAO_storage.tz : metadata_host_address =
+$(OUT)/treasuryDAO_storage.tz : metadata_host_chain =
+$(OUT)/treasuryDAO_storage.tz : metadata_key =
 $(OUT)/treasuryDAO_storage.tz: src/**
 	# ============== Compiling TreasuryDAO storage ============== #
 	mkdir -p $(OUT)
-	$(BUILD_STORAGE) --output-file $(OUT)/treasuryDAO_storage.tz src/treasuryDAO.mligo base_DAO_contract 'default_treasury_DAO_full_storage(("$(admin_address)": address), ("$(token_address)": address), (${a}, $(b), $(s_max), $(c), $(d), $(y), $(z)))'
+	$(BUILD_STORAGE) --output-file $(OUT)/treasuryDAO_storage.tz src/treasuryDAO.mligo base_DAO_contract 'default_treasury_DAO_full_storage(("$(admin_address)": address), ("$(token_address)": address), (${a}, $(b), $(s_max), $(c), $(d), $(y), $(z)), $(call make-metadata,$(metadata_host_address),$(metadata_host_chain),$(metadata_key)))'
 	# ============== Compilation successful ============== #
 	# See "$(OUT)/treasuryDAO_storage.tz" for compilation result #
 	#

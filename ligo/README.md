@@ -103,7 +103,7 @@ As with the default storage this can be generated with the `ligo
 compile-storage` command, or `make`:
 
 ```bash
-make admin_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" token_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" s_max=12n a=1n b=0n c=1n d=1n out/registryDAO_storage.tz
+make admin_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" token_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" s_max=12n a=1n b=0n c=1n d=1n metadata_host_address=tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af metadata_host_chain=foo metadata_key=bar out/registryDAO_storage.tz
 ```
 
 All the arguments to the above command are optional, and will be filled with
@@ -117,6 +117,9 @@ b = 0n
 s_max = 100n
 c = 1n
 d = 0n
+metadata_host_address =
+metadata_host_chain =
+metadata_key =
 ```
 
 The `default_registry_DAO_full_storage` is a LIGO function defined in
@@ -124,7 +127,8 @@ The `default_registry_DAO_full_storage` is a LIGO function defined in
 which is converted into Michelson using the `compile-storage` command. The
 arguments to this function are the admin address, the token address and the
 configuration parameters described in the Registry spec, which are `a`, `b`,
-`s_max`, `c` and `d`.
+`s_max`, `c` and `d`. Additionally, a `metadata` parameter is accepted,
+accepting a `big_map` described per TZIP-16.
 
 ### TreasuryDAO
 
@@ -134,7 +138,7 @@ Michelson expression during the BaseDAO origination using the `ligo
 compile-storage` command as follows.
 
 ```bash
-make admin_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" token_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" s_max=12n a=1n b=0n c=1n d=1n y=0mutez z=100mutez out/treasuryDAO_storage.tz
+make admin_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" token_address="tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" s_max=12n a=1n b=0n c=1n d=1n y=0mutez z=100mutez metadata_host_address= metadata_host_chain= metadata_key= out/treasuryDAO_storage.tz
 ```
 
 This uses the `default_treasury_DAO_full_storage` which is a LIGO function defined in
@@ -146,3 +150,7 @@ The arguments to this function are:
 - the token address
 - a tuple value consisting of configuration parameters described in the Treasury spec which are:
     - `a`, `b`, `s_max`, `c`, `d`, `x`, and `z`.
+- the metadata host address, host chain and key defined by the parameters:
+    - metadata_host_address
+    - metadata_host_chain
+    - metadata_key
