@@ -65,8 +65,8 @@ export class BaseDAOContract {
       const Tezos = new TezosToolkit(this.nodeAddr);
       Tezos.setProvider({ signer: new InMemorySigner(this.senderSk) });
       this.contract = Tezos.contract.at(this.contractAddr);
-      return this.contract;
-    } else return this.contract;
+    }
+    return this.contract;
   }
 
   public inspectParameter(): void {
@@ -94,97 +94,83 @@ export class BaseDAOContract {
             return this;
           });
         })
-        //.catch((error) => println(`Error: ${JSON.stringify(error, null, 2)}`));
-        .catch((error) => println(`Error: ${error.toString()}`));
+        .catch((error) => println(`Error: ${JSON.stringify(error, null, 2)}`));
   }
 
   // entrypoint methods
   balance_of(arg: Balance_of): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.balance_of(arg.requests, arg.callback);
-      });
+    return this.withContract(
+      contract => contract.methods.balance_of(arg.requests, arg.callback));
   }
 
   burn(arg: Burn): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.burn(arg.from_, arg.token_id, arg.amount);
-    });
+    return this.withContract(
+      contract => contract.methods.burn(arg.from_, arg.token_id, arg.amount));
   }
 
   accept_ownership(): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.accept_ownership(unit);
-    });
+    return this.withContract(
+      contract => contract.methods.accept_ownership(unit));
   }
 
   call_custom(arg: CallCustom): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.callCustom(arg[0], arg[1]);
-    });
+    return this.withContract(
+      contract => contract.methods.callCustom(arg[0], arg[1]));
   }
 
   confirm_migration(): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.confirm_migration(unit);
-    });
+    return this.withContract(
+      contract => contract.methods.confirm_migration(unit));
   }
 
   drop_proposal(arg: Drop_proposal): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.drop_proposal(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.drop_proposal(arg));
   }
 
   flush(arg: Flush): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.flush(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.flush(arg));
   }
 
   get_total_supply(arg: Get_total_supply): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.get_total_supply(arg.viewParam, arg.viewCallbackTo);
-    });
+    return this.withContract(
+      contract =>  contract.methods.get_total_supply(arg.viewParam, arg.viewCallbackTo));
   }
 
   getVotePermitCounter(arg: GetVotePermitCounter): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.getVotePermitCounter(arg.viewParam, arg.viewCallbackTo);
-    });
+    return this.withContract(
+      contract => contract.methods.getVotePermitCounter(arg.viewParam, arg.viewCallbackTo));
   }
 
   migrate(arg: Migrate): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.migrate(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.migrate(arg));
   }
 
   mint(arg: Mint): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.mint(arg.to_, arg.token_id, arg.amount);
-    });
+    return this.withContract(
+      contract => contract.methods.mint(arg.to_, arg.token_id, arg.amount));
   }
 
   propose(arg: Propose): Promise<string|void> {
-    return this.withContract((contract) => {
-      let proposalMetadata : MichelsonMap<ExtractMapKey<Propose["proposal_metadata"]>, ExtractMapValue<Propose["proposal_metadata"]>> = new MichelsonMap();
-      for (let [k, v] of arg.proposal_metadata.entries()) {
-        proposalMetadata.set(k, v);
-      }
-      return contract.methods.propose(arg.frozen_token, proposalMetadata);
-    });
+    let proposalMetadata : MichelsonMap<ExtractMapKey<Propose["proposal_metadata"]>, ExtractMapValue<Propose["proposal_metadata"]>> = new MichelsonMap();
+    for (let [k, v] of arg.proposal_metadata.entries()) {
+      proposalMetadata.set(k, v);
+    }
+
+    return this.withContract(
+      contract => contract.methods.propose(arg.frozen_token, proposalMetadata));
   }
 
   set_quorum_threshold(arg: Set_quorum_threshold): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.set_quorum_threshold(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.set_quorum_threshold(arg));
   }
 
   set_voting_period(arg: Set_voting_period): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.set_voting_period(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.set_voting_period(arg));
   }
 
   startup(arg: Startup): Promise<string|void> {
@@ -198,33 +184,28 @@ export class BaseDAOContract {
   }
 
   transfer(arg: Transfer): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.transfer(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.transfer(arg));
   }
 
   transfer_contract_tokens(arg: Transfer_contract_tokens): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.transfer_contract_tokens(arg.contract_address, arg.params);
-    });
+    return this.withContract(
+      contract => contract.methods.transfer_contract_tokens(arg.contract_address, arg.params));
   }
 
   transfer_ownership(arg: Transfer_ownership): Promise<string|void> {
-    return this.withContract((contract) => {
-      return contract.methods.transfer_ownership(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.transfer_ownership(arg));
   }
 
   update_operators(arg: Update_operators) {
 
-    return this.withContract((contract) => {
-      return contract.methods.update_operators(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.update_operators(arg));
   }
 
   vote(arg: Vote) {
-    return this.withContract((contract) => {
-      return contract.methods.vote(arg);
-    });
+    return this.withContract(
+      contract => contract.methods.vote(arg));
   }
 }
