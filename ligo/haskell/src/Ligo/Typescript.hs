@@ -44,8 +44,10 @@ data EpType
   | EpOr AnnotatedField AnnotatedField
   deriving stock (Show, Generic)
 
-type AnnotatedField
- = (FieldAnn, EpType)
+data AnnotatedField = AnnotatedField
+  { afNote :: FieldAnn
+  , afType :: EpType
+  } deriving stock Show
 
 -- An entrypoint extracted from parameter with entrypoint name
 -- and the type of the parameter it wraps.
@@ -61,8 +63,8 @@ toEpType (NTNat _) = EpNat
 toEpType (NTUnit _) = EpUnit
 toEpType (NTSignature _) = EpSignature
 toEpType (NTOption _ a) = EpOption (toEpType a)
-toEpType (NTOr _ n1 n2 f1 f2) = EpOr (n1, toEpType f1) (n2, toEpType f2)
-toEpType (NTPair _ n1 n2 f1 f2) = EpPair (n1, toEpType f1) (n2, toEpType f2)
+toEpType (NTOr _ n1 n2 f1 f2) = EpOr (AnnotatedField n1 (toEpType f1)) (AnnotatedField n2 (toEpType f2))
+toEpType (NTPair _ n1 n2 f1 f2) = EpPair (AnnotatedField n1 (toEpType f1)) (AnnotatedField n2 (toEpType f2))
 toEpType (NTKey _) = EpKey
 toEpType (NTChainId _) = EpChainId
 toEpType (NTList _ a) = EpList (toEpType a)
@@ -157,12 +159,16 @@ data TsModule = TsModule
   , tsmExports :: [Typename]
   } deriving stock Generic
 
-type IsOptional = Bool
-
 -- Represents the right side of a Type definition in Typescript.
+data InterfaceField = InterfaceField
+  { ifFieldName :: Fieldname
+  , ifFieldType :: TsType
+  , ifIsOptional :: Bool
+  }
+
 data TsTypeDef
   = TsUnion [TsType]
-  | TsInterface [(Fieldname, (TsType, IsOptional))]
+  | TsInterface [InterfaceField]
   | TsTuple [TsType]
   | TsAlias TsType
   deriving stock Generic
@@ -173,8 +179,8 @@ instance Buildable TsTypeDef where
   build (TsTuple fs) =  Fmt.unwordsF ["[", T.intercalate ", " (Fmt.pretty <$> fs), "];"]
   build (TsInterface fns) =  Fmt.unlinesF ["{", Fmt.indentF 2 $ Fmt.unlinesF $ mkPair <$> fns, "};"]
     where
-      mkPair :: (Fieldname, (TsType, IsOptional)) -> Text
-      mkPair (fn, (tn, isOptional)) =
+      mkPair :: InterfaceField -> Text
+      mkPair (InterfaceField fn tn isOptional) =
         case isOptional of
           True -> fn <> "?: " <> (Fmt.pretty tn) <> ";"
           False -> fn <> ": " <> (Fmt.pretty tn) <> ";"
@@ -250,9 +256,9 @@ mkTypesFor typename epType = case epType of
         in thisType : (concat fieldDefinitions)
       True -> let
         decls = (mkTypesForField False) <$> (indexEmptyFields allFields)
-        recordFields = (\(a, b, _) -> (a, b)) <$> decls
+        recordFields = fst <$> decls
         thisType = TsType typename (TsInterface recordFields)
-        thisDecls = (\(_, _, c) -> c) <$> decls
+        thisDecls = snd <$> decls
         in thisType : (concat thisDecls)
 
   EpOr af1 af2 -> let
@@ -260,10 +266,10 @@ mkTypesFor typename epType = case epType of
     fields2 = flattenOrs af2
 
     decls = (mkTypesForField True) <$> (indexEmptyFields $ fields1 <> fields2)
-    typeOptions = (\(_, (b, _), _) ->  b) <$> decls
+    typeOptions = (ifFieldType . fst) <$> decls
       -- Throws away information about if the field is optional. Need to check if it is relevant in 'Or' structures
     thisType = TsType typename (TsUnion typeOptions)
-    thisDecls = (\(_, _, c) -> c) <$> decls
+    thisDecls = snd <$> decls
     in thisType : (concat thisDecls)
 
   EpList a -> let
@@ -372,7 +378,7 @@ mkTypesFor typename epType = case epType of
       True -> let
         innerName = typename_ <> "Item"
         inner = TsType innerName (TsInterface flds)
-        in [inner, TsType tname (TsInterface [(dname, (TsCustom innerName, False))])]
+        in [inner, TsType tname (TsInterface [InterfaceField dname (TsCustom innerName) False])]
       False -> [a]
     addDisciminatorFor _ _ a = [a]
 
@@ -381,7 +387,7 @@ mkTypesFor typename epType = case epType of
     mkTypesForField
       :: Bool
       -> (Fieldname, EpType)
-      -> (Fieldname, (TsType, IsOptional), [TsDecl])
+      -> (InterfaceField, [TsDecl])
     mkTypesForField addDisciminator (fn, bt) = let
       subTypename = typename <> (ucFirst fn)
       in case bt of
@@ -390,31 +396,33 @@ mkTypesFor typename epType = case epType of
           withDiscriminator = case addDisciminator of
             True -> concatMap (addDisciminatorFor subTypename fn) tsDcls
             _ -> tsDcls
-          in (fn, (inner, True), withDiscriminator)
+          in (InterfaceField fn inner True, withDiscriminator)
         _ -> let
           (inner, tsDcls) = mkTypesExcludingPrimitives subTypename bt
           withDiscriminator = case addDisciminator of
             True -> concatMap (addDisciminatorFor subTypename fn) tsDcls
             _ -> tsDcls
-          in (fn, (inner, False), withDiscriminator)
+          in (InterfaceField
+                { ifFieldName = fn
+                , ifFieldType = inner
+                , ifIsOptional = False
+                }, withDiscriminator)
 
 -- While creating interfaces, if there are fields where no field
 -- name was found, put numeric strings for the fieldname.
 indexEmptyFields :: [(Fieldname, EpType)] -> [(Fieldname, EpType)]
 indexEmptyFields f = zipWith zipFn f ([0..] :: [Int])
   where
-    zipFn (fn, t) idx = case fn == "" of
-      True -> (show idx, t)
-      _ -> (fn, t)
+    zipFn (fn, t) idx = (bool fn (show idx) (fn == ""), t)
 
 -- Flatten an OR type.
 flattenOrs :: AnnotatedField -> [(Fieldname, EpType)]
-flattenOrs (fn, bt) = case fn == noAnn of
+flattenOrs (AnnotatedField fn bt) = case fn == noAnn of
   -- If this field have an annotation, then
   -- immediately return it. else descent into its branches.
   False -> [(unAnnotation fn, bt)]
   True -> case bt of
-    EpOr lf@(lfn, lft) rf@(rfn, rft) -> let
+    EpOr lf@(AnnotatedField lfn lft) rf@(AnnotatedField rfn rft) -> let
       leftFields = case lfn == noAnn of
         True -> flattenOrs lf
         False -> [(unAnnotation lfn, lft)]
@@ -426,10 +434,10 @@ flattenOrs (fn, bt) = case fn == noAnn of
 
 -- Flatten a Pair type.
 flattenPairs :: AnnotatedField -> [(Fieldname, EpType)]
-flattenPairs (fn, bt) = case fn == noAnn of
+flattenPairs (AnnotatedField fn bt) = case fn == noAnn of
   False -> [(unAnnotation fn, bt)]
   True -> case bt of
-    EpPair lf@(lfn, lft) rf@(rfn, rft) -> let
+    EpPair lf@(AnnotatedField lfn lft) rf@(AnnotatedField rfn rft) -> let
       leftFields = case lfn == noAnn of
         True -> flattenPairs lf
         False -> [(unAnnotation lfn, lft)]
