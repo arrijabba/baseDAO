@@ -20,3 +20,6 @@ type proposal_type =
   | Normal_proposal of registry_diff
   | Update_receivers_proposal of update_receiver_param
   | Configuration_proposal
+
+type fetch_key_param = (registry_key * address)
+type fetch_key_view = (registry_key * (registry_value option)) contract
