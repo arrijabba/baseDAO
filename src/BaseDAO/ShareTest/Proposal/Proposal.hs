@@ -31,6 +31,8 @@ validProposal  _ originateFn = do
   let params = ProposeParams
         { ppFrozenToken = 10
         , ppProposalMetadata = proposalMetadataFromNum 1
+        , ppName = [mt|Valid Proposal|]
+        , ppDescription = [mt|The proposal is valid|]
         }
 
   withSender (AddressResolved owner1) $ call dao (Call @"Propose") params
@@ -46,7 +48,7 @@ validProposal  _ originateFn = do
   withSender (AddressResolved owner1) $ call dao (Call @"Get_total_supply") (mkView frozenTokenId consumer2)
   checkStorage (AddressResolved $ toAddress consumer2) (toVal [10 :: Natural]) -- initial = 0
 
-  -- TODO [#31]: Currently proposalId is expected to be knowned (checkInStorage)
+  -- TODO [#31]: Currently proposalId is expected to be known (checkInStorage)
 
   -- TODO [#31]
   -- checkIfAProposalExist (makeProposalKey params owner1) dao
@@ -63,6 +65,8 @@ rejectProposal _ originateFn = do
   let params = ProposeParams
         { ppFrozenToken = 9
         , ppProposalMetadata = proposalMetadataFromNum 1
+        , ppName = [mt|Rejected Proposal|]
+        , ppDescription = [mt|The proposal has been rejected|]
         }
 
   withSender (AddressResolved owner1) $ call dao (Call @"Propose") params
@@ -80,6 +84,8 @@ insufficientTokenProposal _ originateFn = do
   let params = ProposeParams
         { ppFrozenToken = 101
         , ppProposalMetadata = proposalMetadataFromNum 1
+        , ppName = [mt|Insufficient Tokens|]
+        , ppDescription = [mt|There are insufficient balances|]
         }
 
   withSender (AddressResolved owner1) $ call dao (Call @"Propose") params

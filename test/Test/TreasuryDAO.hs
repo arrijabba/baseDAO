@@ -52,6 +52,8 @@ validProposal = uncapsNettest $ do
       params t = DAO.ProposeParams
         { ppFrozenToken = t
         , ppProposalMetadata = proposal
+        , ppName = [mt||]
+        , ppDescription = [mt||]
         }
       expectedToken = fromInteger $ toInteger $ length $ lPackValueRaw proposal
 
@@ -188,6 +190,8 @@ createSampleProposal t pm owner1 dao = do
   let params = DAO.ProposeParams
         { ppFrozenToken = t
         , ppProposalMetadata = pm
+        , ppName = [mt||]
+        , ppDescription = [mt||]
         }
 
   withSender (AddressResolved owner1) $ call dao (Call @"Propose") params

@@ -45,12 +45,16 @@ validProposal = uncapsNettest $ do
       (DAO.ProposeParams
         { ppFrozenToken = 20
         , ppProposalMetadata = sampleMetadataContent $ toAddress consumer
+        , ppName = [mt||]
+        , ppDescription = [mt||]
         }) & expectCustomError_ #fAIL_PROPOSAL_CHECK
 
     call dao (Call @"Propose")
       (DAO.ProposeParams
        { ppFrozenToken = 15
        , ppProposalMetadata = sampleMetadataBalance $ toAddress consumer
+        , ppName = [mt||]
+        , ppDescription = [mt||]
        })
 
   checkTokenBalance (DAO.frozenTokenId) dao owner1 15
@@ -144,6 +148,8 @@ createSampleProposal pm owner1 dao = do
   let params = DAO.ProposeParams
         { ppFrozenToken = 10
         , ppProposalMetadata = pm
+        , ppName = [mt||]
+        , ppDescription = [mt||]
         }
 
   withSender (AddressResolved owner1) $ call dao (Call @"Propose") params

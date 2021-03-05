@@ -90,7 +90,9 @@ let add_proposal (propose_params, store : propose_params * storage): storage =
     ; metadata = propose_params.proposal_metadata
     ; proposer = Tezos.sender
     ; proposer_frozen_token = propose_params.frozen_token
-    ; voters = ([] : (address * nat) list)
+    ; voters = ([] : (address * (nat * vote_type)) list)
+    ; name = propose_params.name
+    ; description = propose_params.description
     } in
   { store with
     proposals =
@@ -139,7 +141,7 @@ let submit_vote (proposal, vote_param, author, store : proposal * vote_param * a
     in
   let proposal =
     { proposal with
-      voters = (author, vote_param.vote_amount) :: proposal.voters
+      voters = (author, (vote_param.vote_amount, vote_param.vote_type)) :: proposal.voters
     } in
   let (ledger, total_supply) = freeze (vote_param.vote_amount, author, store.ledger, store.total_supply) in
 
@@ -268,8 +270,8 @@ let unfreeze_proposer_and_voter_token
 
   // unfreeze_voter_token
   let do_unfreeze = fun
-        ( (ledger, total_supply), (addr, tokens)
-        : (ledger * total_supply) * (address * nat)
+        ( (ledger, total_supply), (addr, (tokens, _))
+        : (ledger * total_supply) * (address * (nat * vote_type))
         ) -> unfreeze(tokens, addr, ledger, total_supply) in
 
   let (ledger, total_supply) = List.fold do_unfreeze proposal.voters (ledger, total_supply) in

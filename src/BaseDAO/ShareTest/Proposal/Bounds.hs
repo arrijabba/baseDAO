@@ -77,6 +77,8 @@ proposalBoundedValue _ originateFn = do
   let params = ProposeParams
         { ppFrozenToken = 10
         , ppProposalMetadata = proposalMetadataFromNum 1
+        , ppName = [mt|Max Proposals Reached|]
+        , ppDescription = [mt|The maximum number of proposals has been reached|]
         }
 
   withSender (AddressResolved owner1) $ do

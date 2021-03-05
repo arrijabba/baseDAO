@@ -107,7 +107,9 @@ decisionLambda
   :-> List Operation : store : s
 decisionLambda = do
   constructT @(DAO.ProposeParams (RegistryDaoProposalMetadata k v))
-    ( fieldCtor $ getField #pProposerFrozenToken
+    ( fieldCtor $ getField #pDescription
+    , fieldCtor $ getField #pProposerFrozenToken
+    , fieldCtor $ getField #pName
     , fieldCtor $ getField #pMetadata
     )
   dip $ getField #pProposer; pair; DAO.toProposalKey

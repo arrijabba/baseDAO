@@ -64,11 +64,11 @@ validProposal = uncapsNettest $ withFrozenCallStack do
     proposalSize = metadataSize proposalMeta
 
   withSender (AddressResolved owner1) $
-    call dao (Call @"Propose") (ProposeParams (proposalSize + 1) proposalMeta)
+    call dao (Call @"Propose") (ProposeParams [mt|This should fail|] (proposalSize + 1) [mt|Fail Proposal|] proposalMeta)
     & expectCustomError_ #fAIL_PROPOSAL_CHECK
 
   withSender (AddressResolved owner1) $
-    call dao (Call @"Propose") (ProposeParams proposalSize proposalMeta)
+    call dao (Call @"Propose") (ProposeParams [mt|This should not fail|] proposalSize [mt|Non-Fail Proposal|] proposalMeta)
 
   checkTokenBalance (DAO.frozenTokenId) dao owner1 166
   checkTokenBalance (DAO.unfrozenTokenId) dao owner1 34
@@ -100,7 +100,7 @@ flushTokenTransfer = uncapsNettest $ withFrozenCallStack $ do
         )
       ]
     proposalSize = metadataSize proposalMeta
-    proposeParams = ProposeParams proposalSize proposalMeta
+    proposeParams = ProposeParams [mt||] proposalSize [mt||] proposalMeta
 
   withSender (AddressResolved owner1) $
     call dao (Call @"Propose") proposeParams
@@ -143,7 +143,7 @@ flushXtzTransfer = uncapsNettest $ withFrozenCallStack $ do
           ]
         )
       ]
-    proposeParams amt = ProposeParams (metadataSize $ proposalMeta amt) $ proposalMeta amt
+    proposeParams amt = ProposeParams [mt||] (metadataSize $ proposalMeta amt) [mt|Transfer|] $ proposalMeta amt
 
   withSender (AddressResolved owner1) $ do
   -- due to smaller than min_xtz_amount

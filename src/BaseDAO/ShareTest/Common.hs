@@ -229,6 +229,8 @@ createSampleProposal counter owner1 dao = do
   let params = ProposeParams
         { ppFrozenToken = 10
         , ppProposalMetadata = proposalMetadataFromNum counter
+        , ppName = [mt|Sample|]
+        , ppDescription = [mt|This proposal is a sample|]
         }
 
   withSender (AddressResolved owner1) $ call dao (Call @"Propose") params

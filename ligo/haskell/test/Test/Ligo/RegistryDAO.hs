@@ -60,7 +60,7 @@ test_RegistryDAO =
             proposalMeta = DynamicRec mempty
             proposalSize = metadataSize proposalMeta
             in withSender (AddressResolved wallet1) $ call baseDao (Call @"Propose")
-              (ProposeParams proposalSize proposalMeta)
+              (ProposeParams [mt||] proposalSize [mt||] proposalMeta)
 
     , nettestScenarioCaps "proposal exceeding max_proposal_size result in error" $
         withOriginated 2
@@ -72,7 +72,7 @@ test_RegistryDAO =
               [(mkMTextUnsafe ("long_key" <> (show @_ @Int t)), "long_value") | t <- [1..10]]
             proposalSize = metadataSize proposalMeta
             in withSender (AddressResolved wallet1) $ call
-               baseDao (Call @"Propose") (ProposeParams proposalSize proposalMeta)
+               baseDao (Call @"Propose") (ProposeParams [mt|This proposal exceeds the maximum size|] proposalSize [mt|Big Proposal|] proposalMeta)
                & expectFailProposalCheck
 
     , nettestScenarioCaps "checks it fails if required tokens are not frozen" $
@@ -84,7 +84,7 @@ test_RegistryDAO =
             -- frozen_scale_value, frozen_extra_value set to 1 and 0 means that it requires 6
             -- tokens to be frozen (6 * 1 + 0) because proposal size happen to be 6 here.
             in withSender (AddressResolved wallet1) $
-               call baseDao (Call @"Propose") (ProposeParams 2 proposalMeta)
+               call baseDao (Call @"Propose") (ProposeParams [mt|Test proposal with unfrozen tokens|] 2 [mt|Unfrozen Tokens|] proposalMeta)
                & expectFailProposalCheck
 
     , nettestScenarioCaps "check it correctly calculates required frozen tokens" $
@@ -96,7 +96,7 @@ test_RegistryDAO =
             -- frozen_extra_value set to 1 and 2 means that it requires 8 tokens to be
             -- frozen (6 * 1 + 2) because proposal size happen to be 6 here.
             in withSender (AddressResolved wallet1) $
-               call baseDao (Call @"Propose") (ProposeParams 8 proposalMeta)
+               call baseDao (Call @"Propose") (ProposeParams [mt|Test proposal with frozen tokens|] 8 [mt|Frozen Tokens|] proposalMeta)
 
     , nettestScenarioCaps "checks it correctly calculates tokens to unfreeze when rejecting" $ do
         let frozen_scale_value = 2
@@ -117,7 +117,7 @@ test_RegistryDAO =
             in do
               let requiredFrozen = proposalSize1 * frozen_scale_value + frozen_extra_value
               withSender (AddressResolved wallet1) $
-                call baseDao (Call @"Propose") (ProposeParams requiredFrozen proposalMeta1)
+                call baseDao (Call @"Propose") (ProposeParams [mt|Test proposal|] requiredFrozen [mt|Test Proposal|] proposalMeta1)
 
               advanceTime (day 12) -- voting period is 11 days.
               withSender (AddressResolved admin) $
@@ -160,9 +160,12 @@ test_RegistryDAO =
               runIO $ putTextLn $ show largeProposalSize
               let requiredFrozen = largeProposalSize * frozen_scale_value + frozen_extra_value
 
+              let proposalName = [mt|Increase Proposal Size|]
+              let proposalDesc = [mt|This proposal increases the proposal size|]
+
               -- We expect this to fail because max_proposal_size is 200 and proposal size is 317.
               withSender (AddressResolved wallet1) $
-                call baseDao (Call @"Propose") (ProposeParams requiredFrozen largeProposalMeta)
+                call baseDao (Call @"Propose") (ProposeParams proposalDesc requiredFrozen proposalName largeProposalMeta)
                 & expectFailProposalCheck
 
               -- We create a new proposal to increase max_proposal_size to largeProposalSize + 1.
@@ -177,10 +180,11 @@ test_RegistryDAO =
               let requiredFrozenForUpdate = sMaxUpdateproposalSize1 * frozen_scale_value + frozen_extra_value
 
               withSender (AddressResolved wallet1) $
-                call baseDao (Call @"Propose") (ProposeParams requiredFrozenForUpdate sMaxUpdateproposalMeta1)
+                call baseDao (Call @"Propose") (ProposeParams proposalDesc requiredFrozenForUpdate proposalName sMaxUpdateproposalMeta1)
 
-              -- Then we send 2 upvotes for the proposal (as min quorum is 2)
-              let proposalKey = makeProposalKey @ProposalMetadataL (ProposeParams requiredFrozenForUpdate sMaxUpdateproposalMeta1) wallet1
+              -- Then we send 2 upvotes for the proposal (as min quorum is 2).
+              -- Name and description should match.
+              let proposalKey = makeProposalKey @ProposalMetadataL (ProposeParams proposalDesc requiredFrozenForUpdate proposalName sMaxUpdateproposalMeta1) wallet1
               withSender (AddressResolved voter1) $
                 call baseDao (Call @"Vote") [PermitProtected (VoteParam proposalKey True 2) Nothing]
 
@@ -190,7 +194,43 @@ test_RegistryDAO =
 
               -- Now we expect this to work
               withSender (AddressResolved wallet1) $
-                call baseDao (Call @"Propose") (ProposeParams requiredFrozen largeProposalMeta)
+                call baseDao (Call @"Propose") (ProposeParams proposalDesc requiredFrozen proposalName largeProposalMeta)
+
+    , nettestScenarioCaps "checks that we can only vote if name and description match (#151)" $
+        withOriginated 6
+          (liftA2 initialStorageWithExplictRegistryDAOConfig Unsafe.head Unsafe.tail)
+          \[_admin, wallet, voter1, voter2, voter3, voter4] _ baseDao -> do
+            let proposalName = [mt|Li renda immune dall'error|]
+            let proposalDesc = [mt|Tocchino alfin l'impervia meta|]
+            let proposalMeta = DynamicRec mempty
+            let proposalSize = metadataSize proposalMeta
+            let proposeParams = ProposeParams proposalDesc proposalSize proposalName proposalMeta
+
+            withSender (AddressResolved wallet) $
+              call baseDao (Call @"Propose") proposeParams
+
+            let incorrectProposalName = [mt|Make them immune from error|]
+            let incorrectProposalDesc = [mt|So they can eventually reach their impenetrable goal|]
+            let incorrectProposeParams1 = ProposeParams incorrectProposalDesc proposalSize proposalName proposalMeta
+            let incorrectProposalKey1 = makeProposalKey @ProposalMetadataL incorrectProposeParams1 wallet
+            let incorrectProposeParams2 = ProposeParams proposalDesc proposalSize incorrectProposalName proposalMeta
+            let incorrectProposalKey2 = makeProposalKey @ProposalMetadataL incorrectProposeParams2 wallet
+            let incorrectProposeParams3 = ProposeParams incorrectProposalDesc proposalSize incorrectProposalName proposalMeta
+            let incorrectProposalKey3 = makeProposalKey @ProposalMetadataL incorrectProposeParams3 wallet
+
+            -- Have three incorrect votes and one correct vote:
+            let proposalKey = makeProposalKey @ProposalMetadataL proposeParams wallet
+            withSender (AddressResolved voter1) $
+              call baseDao (Call @"Vote") [PermitProtected (VoteParam incorrectProposalKey1 False 1) Nothing]
+              & expectProposalNotExist
+            withSender (AddressResolved voter2) $
+              call baseDao (Call @"Vote") [PermitProtected (VoteParam incorrectProposalKey2 True 1) Nothing]
+              & expectProposalNotExist
+            withSender (AddressResolved voter3) $
+              call baseDao (Call @"Vote") [PermitProtected (VoteParam incorrectProposalKey3 False 2) Nothing]
+              & expectProposalNotExist
+            withSender (AddressResolved voter4) $
+              call baseDao (Call @"Vote") [PermitProtected (VoteParam proposalKey True 2) Nothing]
     ]
   ]
   where
@@ -244,3 +284,8 @@ expectFailProposalCheck
   :: (MonadNettest caps base m)
   => m a -> m ()
 expectFailProposalCheck = expectCustomError_ #fAIL_PROPOSAL_CHECK
+
+expectProposalNotExist
+  :: (MonadNettest caps base m)
+  => m a -> m ()
+expectProposalNotExist = expectCustomError_ #pROPOSAL_NOT_EXIST

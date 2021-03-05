@@ -55,6 +55,8 @@ flushProposalIntegrational = do
     params t = DAO.ProposeParams
         { ppFrozenToken = t
         , ppProposalMetadata = proposal
+        , ppName = [mt||]
+        , ppDescription = [mt||]
         }
 
     expectedToken = fromInteger $ toInteger $ length $ lPackValueRaw proposal

@@ -61,7 +61,9 @@ let treasury_DAO_decision_lambda (proposal, extras : proposal * contract_extra)
     : operation list * contract_extra =
   let propose_param : propose_params = {
     frozen_token = proposal.proposer_frozen_token;
-    proposal_metadata = proposal.metadata
+    proposal_metadata = proposal.metadata;
+    name = proposal.name;
+    description = proposal.description;
     } in
   let proposal_key = to_proposal_key (propose_param, proposal.proposer) in
   let ts = unpack_transfer_type_list("transfers", proposal.metadata) in

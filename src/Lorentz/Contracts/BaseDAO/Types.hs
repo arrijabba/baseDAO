@@ -632,7 +632,9 @@ data Proposal proposalMetadata = Proposal
   , pProposer            :: Address
   , pProposerFrozenToken :: Natural
 
-  , pVoters              :: [(Address, Natural)]
+  , pVoters              :: [(Address, (Natural, VoteType))]
+  , pName                :: MText
+  , pDescription         :: MText
   }
   deriving stock (Generic, Show)
   deriving anyclass IsoValue
@@ -652,9 +654,11 @@ instance HasAnnotation pm => HasAnnotation (Proposal pm) where
 ------------------------------------------------------------------------
 
 data ProposeParams proposalMetadata = ProposeParams
-  { ppFrozenToken      :: Natural
+  { ppDescription      :: MText
+  , ppFrozenToken      :: Natural
   --  ^ Determines how many sender's tokens will be frozen to get
   -- the proposal accepted
+  , ppName             :: MText
   , ppProposalMetadata :: proposalMetadata
   }
   deriving stock (Generic, Show)

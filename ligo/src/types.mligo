@@ -87,6 +87,8 @@ type migration_status =
   | MigratingTo of address
   | MigratedTo of address
 
+type vote_type = bool
+
 type proposal_key = bytes
 type proposal_metadata = (string, bytes) map
 type proposal =
@@ -96,10 +98,10 @@ type proposal =
   ; metadata : proposal_metadata
   ; proposer : address
   ; proposer_frozen_token : nat
-  ; voters : (address * nat) list
+  ; voters : (address * (nat * vote_type)) list
+  ; name : string
+  ; description : string
   }
-
-type vote_type = bool
 
 type voting_period = nat
 type quorum_threshold = nat
@@ -144,6 +146,8 @@ type custom_ep_param = (string * bytes)
 type propose_params =
   { frozen_token : nat
   ; proposal_metadata : proposal_metadata
+  ; name : string
+  ; description : string
   }
 
 type vote_param =

@@ -185,6 +185,8 @@ addProposal = do
     , fieldCtor $ sender
     , fieldCtor $ do dup; cdr; toField #ppFrozenToken
     , fieldCtor $ push []
+    , fieldCtor $ do dup; cdr; toField #ppName
+    , fieldCtor $ do dup; cdr; toField #ppDescription
     )
   stackType @[Proposal pm, (Timestamp, ProposeParams pm), store]
   dip swap
@@ -283,10 +285,10 @@ submitVote = do
 
   stackType @(Proposal pm : VoteParam pm : store : "author" :! _ : s)
 
-  duupX @2; toField #vVoteAmount
+  duupX @2; dup; toField #vVoteAmount; dip (toField #vVoteType); pair;
   dupL #author; pair
   dip $ getField #pVoters
-  stackType @((Address, Natural) : [(Address, Natural)] : Proposal pm
+  stackType @((Address, (Natural, Bool)) : [(Address, (Natural, Bool))] : Proposal pm
               : VoteParam pm : store : "author" :! _ : s)
   cons
   setField #pVoters
@@ -531,8 +533,7 @@ unfreezeVoterToken = do
   dup; dig @2; swap
   toField #pVoters
   iter $ do
-    unpair
-    swap
+    dup; cdar; dip car;
     unfreeze
   swap
 

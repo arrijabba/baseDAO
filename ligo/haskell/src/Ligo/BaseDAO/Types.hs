@@ -7,6 +7,8 @@ module Ligo.BaseDAO.Types
   , ProposalMetadataL
   , ContractExtraL
   , ProposeParamsL
+  , ProposalKeyL
+  , VoteParamL
   , RunningParameter (..)
   , StartupParameter
   , ProposalL (..)
@@ -72,7 +74,10 @@ data ProposalL = ProposalL
   , plProposer            :: Address
   , plProposerFrozenToken :: Natural
 
-  , plVoters              :: [(Address, Natural)]
+  , plVoters              :: [(Address, (Natural, VoteType))]
+
+  , plName                :: MText
+  , plDescription         :: MText
   }
   deriving stock (Show)
 
